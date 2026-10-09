@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LanguageProvider } from './i18n';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -14,6 +14,20 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { AccountPage } from './pages/AccountPage';
 import { AuthService } from './services/auth';
+
+const ScrollToTop: React.FC = () => {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' as ScrollBehavior
+    });
+  }, [pathname, search]);
+
+  return null;
+};
 
 export const App: React.FC = () => {
   const [, setAuthTick] = useState(0);
@@ -30,6 +44,7 @@ export const App: React.FC = () => {
   return (
     <LanguageProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-transparent text-slate-100 selection:bg-cyan-500 selection:text-white relative">
           <CyberBackground />
           <div className="relative z-10 flex flex-col min-h-screen">

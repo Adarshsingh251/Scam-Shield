@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth';
 import { useTranslation } from '../i18n';
 import { LanguageSelector } from './LanguageSelector';
 import { Logo } from './Logo';
-import { Shield, Scan, History, FileText, Cpu, BookOpen, User as UserIcon, LogOut, Menu, X } from 'lucide-react';
+import { Shield, Scan, History, FileText, Cpu, User as UserIcon, LogOut, Menu, X } from 'lucide-react';
 
 interface NavbarProps {
   onLogout?: () => void;
@@ -24,7 +24,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       { to: '/reports', label: t('nav.reports'), icon: <FileText className="w-4 h-4" /> },
     ] : []),
     { to: '/models', label: t('nav.models'), icon: <Cpu className="w-4 h-4" /> },
-    { to: '/education', label: t('nav.education'), icon: <BookOpen className="w-4 h-4" /> },
   ];
 
   return (

@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-[#070a12] border-t border-[#1e293b] mt-24 text-slate-400 text-xs py-12">
+    <footer className="bg-[#070a12] border-t border-[#1e293b] mt-8 sm:mt-12 text-slate-400 text-xs py-8 sm:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           <div className="space-y-3 md:col-span-2">

@@ -66,14 +66,9 @@ export const HomePage: React.FC = () => {
       // 1. Initial Hero Staggered Console Entrance (Safe fromTo with clearProps)
       const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      heroTl.fromTo('.hero-badge-elem', 
-        { y: -12, opacity: 0 }, 
-        { y: 0, opacity: 1, duration: 0.4, clearProps: 'all' }
-      )
-      .fromTo('.hero-title-elem', 
+      heroTl.fromTo('.hero-title-elem', 
         { y: 15, opacity: 0 }, 
-        { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' }, 
-        '-=0.2'
+        { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' }
       )
       .fromTo('.hero-desc-elem', 
         { y: 12, opacity: 0 }, 
@@ -191,11 +186,11 @@ export const HomePage: React.FC = () => {
   ];
 
   return (
-    <div ref={pageContainerRef} className="space-y-12 sm:space-y-14 py-4 sm:py-6">
+    <div ref={pageContainerRef} className="space-y-10 sm:space-y-12 pt-1 pb-2 sm:pt-2 sm:pb-4">
       {/* 1. ENTERPRISE TWO-COLUMN HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0e1626] to-[#080d18] border border-slate-800/90 p-6 sm:p-8 lg:p-10 shadow-2xl"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0e1626] to-[#080d18] border border-slate-800/90 px-6 pt-5 pb-6 sm:px-8 sm:pt-6 sm:pb-8 lg:px-10 lg:pt-7 lg:pb-8 shadow-2xl"
       >
         {/* Subtle Background Glow Elements */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -204,12 +199,7 @@ export const HomePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
           {/* Left Column: Product Message & Actions */}
           <div ref={heroLeftRef} className="lg:col-span-7 space-y-6">
-            <div className="hero-badge-elem inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-800/80 text-cyan-300 text-xs font-semibold font-mono uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              {t('home.badge')}
-            </div>
-
-            <h1 className="hero-title-elem text-3xl sm:text-4xl xl:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
+            <h1 className="hero-title-elem text-3xl sm:text-4xl xl:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent leading-[1.15] pb-1">
               {t('home.heroTitle')}
             </h1>
 
@@ -221,7 +211,7 @@ export const HomePage: React.FC = () => {
             <div className="hero-typewriter-elem inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#070c17]/90 border border-cyan-500/30 text-xs sm:text-sm font-mono shadow-inner shadow-cyan-950/40">
               <div className="flex items-center gap-1.5 text-cyan-400 font-bold">
                 {/* <Terminal className="w-3.5 h-3.5" /> */}
-                <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Target:</span>
+                <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">We offer:</span>
               </div>
               <div className="flex items-center font-bold text-cyan-300 min-w-[210px] sm:min-w-[240px]">
                 <span>{typedText}</span>
@@ -239,14 +229,6 @@ export const HomePage: React.FC = () => {
                 <span>{isScanning ? t('scanner.stageValidating') : t('home.launchScanner')}</span>
                 <ArrowRight className={`w-4 h-4 transition-transform ${isScanning ? 'translate-x-1 animate-pulse' : 'group-hover:translate-x-1'}`} />
               </button>
-
-              <Link
-                to="/models"
-                className="hero-cta-elem px-5 py-3.5 rounded-xl bg-[#0b0f19] hover:bg-[#131d33] text-slate-200 border border-slate-800 hover:border-slate-600 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
-              >
-                <Cpu className="w-4 h-4 text-cyan-400" />
-                <span>{t('home.inspectModels')}</span>
-              </Link>
             </div>
           </div>
 
@@ -261,21 +243,33 @@ export const HomePage: React.FC = () => {
           ref={telemetryRef}
           className="mt-8 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono"
         >
-          <div className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60">
-            <div className="text-slate-500 text-[10px] uppercase">{t('home.urlClassifier')}</div>
-            <div className="text-slate-200 font-bold mt-0.5">XGBoost v2.0.0</div>
+          <div
+            onClick={() => navigate('/scanner?tab=url')}
+            className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60 hover:border-cyan-500/60 hover:bg-slate-900/70 transition-all cursor-pointer group"
+          >
+            <div className="text-slate-500 text-[10px] uppercase group-hover:text-cyan-400 transition-colors">{t('home.urlClassifier')}</div>
+            <div className="text-slate-200 font-bold mt-0.5 group-hover:text-white">XGBoost v2.0.0</div>
           </div>
-          <div className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60">
-            <div className="text-slate-500 text-[10px] uppercase">{t('home.messageClassifier')}</div>
-            <div className="text-slate-200 font-bold mt-0.5">TF-IDF + LR v2.0.0</div>
+          <div
+            onClick={() => navigate('/scanner?tab=message')}
+            className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60 hover:border-purple-500/60 hover:bg-slate-900/70 transition-all cursor-pointer group"
+          >
+            <div className="text-slate-500 text-[10px] uppercase group-hover:text-purple-400 transition-colors">{t('home.messageClassifier')}</div>
+            <div className="text-slate-200 font-bold mt-0.5 group-hover:text-white">TF-IDF + LR v2.0.0</div>
           </div>
-          <div className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60">
-            <div className="text-slate-500 text-[10px] uppercase">{t('home.decoders')}</div>
-            <div className="text-slate-200 font-bold mt-0.5">QR + SSRF Web DOM</div>
+          <div
+            onClick={() => navigate('/scanner?tab=qr')}
+            className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60 hover:border-amber-500/60 hover:bg-slate-900/70 transition-all cursor-pointer group"
+          >
+            <div className="text-slate-500 text-[10px] uppercase group-hover:text-amber-400 transition-colors">{t('home.decoders')}</div>
+            <div className="text-slate-200 font-bold mt-0.5 group-hover:text-white">QR + SSRF Web DOM</div>
           </div>
-          <div className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60">
-            <div className="text-slate-500 text-[10px] uppercase">{t('home.decisionArbiter')}</div>
-            <div className="text-slate-200 font-bold mt-0.5">Unified Risk v1.0</div>
+          <div
+            onClick={() => navigate('/models')}
+            className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60 hover:border-cyan-500/60 hover:bg-slate-900/70 transition-all cursor-pointer group"
+          >
+            <div className="text-slate-500 text-[10px] uppercase group-hover:text-cyan-400 transition-colors">{t('home.decisionArbiter')}</div>
+            <div className="text-slate-200 font-bold mt-0.5 group-hover:text-white">Unified Risk v1.0</div>
           </div>
         </div>
       </section>
@@ -291,7 +285,6 @@ export const HomePage: React.FC = () => {
               {t('home.capabilitiesDesc')}
             </p>
           </div>
-          <span className="text-xs text-cyan-400 font-mono">{t('home.zeroFakeAi')}</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -43,8 +43,8 @@ export const de: Translations = {
   },
   home: {
     badge: 'V2.0 Cybersicherheitsarchitektur für die Produktion',
-    heroTitle: 'Hochpräzise multimodale Bedrohungsanalyse & Phishing-Abwehr.',
-    heroDesc: 'Echtzeit-Erkennung von Betrug, manipulierten Nachrichten, QR-Codes und Website-Risiken. Basiert auf reproduzierbaren Machine-Learning-Modellen mit kryptografischer SHA-256-Validierung und echten Prüfdaten.',
+    heroTitle: 'Erst denken, dann klicken – mit Scam Shield.',
+    heroDesc: 'Verdächtige Nachricht, Link, QR-Code oder Website erhalten? Mit Scam Shield prüfen und lernen, worauf Sie achten müssen.',
     launchScanner: 'Multi-Scanner starten',
     inspectModels: 'Modell-Governance & SHA-256 prüfen',
     urlClassifier: 'URL-Klassifikator',

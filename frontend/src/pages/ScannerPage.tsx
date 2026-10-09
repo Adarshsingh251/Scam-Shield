@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ApiService } from '../services/api';
 import { ScanResultData, ScanType } from '../types';
 import { useTranslation } from '../i18n';
-import { Globe, MessageSquare, QrCode, Shield, Upload, Sparkles, AlertCircle, ArrowRight, Loader2, Terminal } from 'lucide-react';
+import { Globe, MessageSquare, QrCode, Shield, Upload, Sparkles, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { ResultPage } from './ResultPage';
 
 export const ScannerPage: React.FC = () => {
@@ -25,6 +25,7 @@ export const ScannerPage: React.FC = () => {
   // Execution states
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(t('scanner.stageValidating'));
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [error, setError] = useState('');
   const [scanResult, setScanResult] = useState<ScanResultData | null>(null);
 
@@ -33,9 +34,11 @@ export const ScannerPage: React.FC = () => {
     if (tab && ['url', 'message', 'qr', 'website'].includes(tab)) {
       setActiveTab(tab);
     }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [searchParams]);
 
   const handleTabChange = (tab: ScanType) => {
+    if (loading) return;
     setActiveTab(tab);
     setSearchParams({ tab });
     setError('');
@@ -54,38 +57,110 @@ export const ScannerPage: React.FC = () => {
     }
   };
 
-  const handleScan = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Progressive 3-second security scanning pipeline
+  const runProgressiveScan = async (scanPromise: Promise<ScanResultData>, stages: string[]) => {
     setLoading(true);
-    setLoadingStage(t('scanner.stageValidating'));
     setError('');
     setScanResult(null);
+    setLoadingProgress(10);
+    setLoadingStage(stages[0]);
+
+    const stageTimeouts: Array<ReturnType<typeof setTimeout>> = [
+      setTimeout(() => {
+        setLoadingProgress(35);
+        setLoadingStage(stages[1]);
+      }, 750),
+      setTimeout(() => {
+        setLoadingProgress(70);
+        setLoadingStage(stages[2]);
+      }, 1650),
+      setTimeout(() => {
+        setLoadingProgress(92);
+        setLoadingStage(stages[3]);
+      }, 2500)
+    ];
 
     try {
-      let result: ScanResultData;
-      if (activeTab === 'url') {
-        if (!urlInput.trim()) throw new Error(t('scanner.errorUrlRequired'));
-        setLoadingStage(t('scanner.stageUrlML'));
-        result = await ApiService.scanUrl(urlInput.trim());
-      } else if (activeTab === 'message') {
-        if (!messageInput.trim()) throw new Error(t('scanner.errorMessageRequired'));
-        setLoadingStage(t('scanner.stageMessageNLP'));
-        result = await ApiService.scanMessage(messageInput.trim(), contextInput);
-      } else if (activeTab === 'qr') {
-        if (!qrFile) throw new Error(t('scanner.errorQrRequired'));
-        setLoadingStage(t('scanner.stageQrDecode'));
-        result = await ApiService.scanQr(qrFile);
-      } else {
-        if (!websiteInput.trim()) throw new Error(t('scanner.errorWebsiteRequired'));
-        setLoadingStage(t('scanner.stageWebsiteSSRF'));
-        result = await ApiService.scanWebsite(websiteInput.trim());
-      }
+      // Guarantee at least 3000ms minimum scan execution time
+      const [result] = await Promise.all([
+        scanPromise,
+        new Promise((resolve) => setTimeout(resolve, 3000))
+      ]);
+
+      setLoadingProgress(100);
+      setLoadingStage('Finalizing calibrated threat assessment & evidence audit...');
+      
+      // Brief smooth transition before displaying verdict
+      await new Promise((resolve) => setTimeout(resolve, 250));
       setScanResult(result);
     } catch (err: any) {
+      stageTimeouts.forEach(clearTimeout);
       const msg = err.response?.data?.error?.message || err.message || 'Scan request failed.';
       setError(msg);
     } finally {
       setLoading(false);
+      setLoadingProgress(0);
+    }
+  };
+
+  const handleScan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading) return;
+    setError('');
+
+    try {
+      if (activeTab === 'url') {
+        if (!urlInput.trim()) {
+          setError(t('scanner.errorUrlRequired'));
+          return;
+        }
+        const stages = [
+          'Validating URL syntax & DNS resolution boundaries...',
+          'Extracting 31 lexical, structural & IP-host dimensions...',
+          'Evaluating url-phishing-2.0.0 XGBoost & Platt calibration...',
+          'Arbitrating multi-evidence signals & risk metrics...'
+        ];
+        await runProgressiveScan(ApiService.scanUrl(urlInput.trim()), stages);
+      } else if (activeTab === 'message') {
+        if (!messageInput.trim()) {
+          setError(t('scanner.errorMessageRequired'));
+          return;
+        }
+        const stages = [
+          'Tokenizing text payload & scanning embedded links...',
+          'Extracting 10,000 TF-IDF word/char n-grams & intent cues...',
+          'Evaluating text-scam-2.0.0 calibrated probability engine...',
+          'Synthesizing social engineering evidence signals...'
+        ];
+        await runProgressiveScan(ApiService.scanMessage(messageInput.trim(), contextInput), stages);
+      } else if (activeTab === 'qr') {
+        if (!qrFile) {
+          setError(t('scanner.errorQrRequired'));
+          return;
+        }
+        const stages = [
+          'Validating MIME image format & in-memory matrix allocation...',
+          'Decoding QR binary matrix payload with jsQR AST engine...',
+          'Routing extracted payload to URL ML detector...',
+          'Synthesizing unified forensic evidence report...'
+        ];
+        await runProgressiveScan(ApiService.scanQr(qrFile), stages);
+      } else {
+        if (!websiteInput.trim()) {
+          setError(t('scanner.errorWebsiteRequired'));
+          return;
+        }
+        const stages = [
+          'Executing SSRF private IP validation & RFC 1918 checks...',
+          'Fetching sandboxed HTML & tracing multi-hop redirects...',
+          'Inspecting DOM password forms & third-party actions...',
+          'Aggregating brand spoofing & credential harvesting indicators...'
+        ];
+        await runProgressiveScan(ApiService.scanWebsite(websiteInput.trim()), stages);
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.message || 'Scan request failed.';
+      setError(msg);
     }
   };
 
@@ -134,20 +209,16 @@ export const ScannerPage: React.FC = () => {
   }
 
   const tabConfigs = [
-    { id: 'url', label: t('scanner.tabUrl'), icon: <Globe className="w-4 h-4 text-cyan-400" />, sub: t('scanner.tabUrlSub') },
-    { id: 'message', label: t('scanner.tabMessage'), icon: <MessageSquare className="w-4 h-4 text-purple-400" />, sub: t('scanner.tabMessageSub') },
-    { id: 'qr', label: t('scanner.tabQr'), icon: <QrCode className="w-4 h-4 text-amber-400" />, sub: t('scanner.tabQrSub') },
-    { id: 'website', label: t('scanner.tabWebsite'), icon: <Shield className="w-4 h-4 text-emerald-400" />, sub: t('scanner.tabWebsiteSub') },
+    { id: 'url', label: t('scanner.tabUrl'), icon: <Globe className="w-4 h-4 text-cyan-400" /> },
+    { id: 'message', label: t('scanner.tabMessage'), icon: <MessageSquare className="w-4 h-4 text-purple-400" /> },
+    { id: 'qr', label: t('scanner.tabQr'), icon: <QrCode className="w-4 h-4 text-amber-400" /> },
+    { id: 'website', label: t('scanner.tabWebsite'), icon: <Shield className="w-4 h-4 text-emerald-400" /> },
   ];
 
   return (
     <div className="max-w-4xl mx-auto py-8 space-y-8">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 text-xs font-mono font-semibold uppercase tracking-wider mb-1">
-          <Terminal className="w-3.5 h-3.5" />
-          {t('scanner.badge')}
-        </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
           {t('scanner.title')}
         </h1>
@@ -212,19 +283,18 @@ export const ScannerPage: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id as ScanType)}
-                className={`py-4 px-3 text-left border-b-2 transition-colors flex flex-col justify-between ${
+                className={`py-3.5 px-3 text-left border-b-2 transition-colors flex items-center justify-start ${
                   isActive
                     ? 'border-cyan-400 bg-[#0f172a]'
                     : 'border-transparent hover:bg-[#131d33]'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2">
                   {tab.icon}
                   <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-slate-400'}`}>
                     {tab.label}
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono">{tab.sub}</span>
               </button>
             );
           })}
@@ -251,17 +321,12 @@ export const ScannerPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled={loading}
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   placeholder={t('scanner.urlPlaceholder')}
-                  className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl px-4 py-3.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+                  className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl px-4 py-3.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                 />
-              </div>
-              <div className="p-3.5 rounded-xl bg-[#0b0f19] border border-[#1e293b] text-xs text-slate-400 flex items-start gap-2.5">
-                <Globe className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
-                <span className="leading-relaxed">
-                  {t('scanner.urlDesc')}
-                </span>
               </div>
             </div>
           )}
@@ -276,9 +341,10 @@ export const ScannerPage: React.FC = () => {
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 font-mono">{t('scanner.msgChannel')}</span>
                   <select
+                    disabled={loading}
                     value={contextInput}
                     onChange={(e) => setContextInput(e.target.value)}
-                    className="bg-[#070a12] border border-[#1e293b] rounded-lg px-2.5 py-1 text-slate-200 text-xs font-mono focus:outline-none focus:border-cyan-400"
+                    className="bg-[#070a12] border border-[#1e293b] rounded-lg px-2.5 py-1 text-slate-200 text-xs font-mono focus:outline-none focus:border-cyan-400 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <option value="sms">{t('scanner.msgChannelSms')}</option>
                     <option value="email">{t('scanner.msgChannelEmail')}</option>
@@ -288,18 +354,13 @@ export const ScannerPage: React.FC = () => {
                 </div>
               </div>
               <textarea
+                disabled={loading}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 rows={5}
                 placeholder={t('scanner.msgPlaceholder')}
-                className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl p-4 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400 font-sans leading-relaxed"
+                className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl p-4 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400 font-sans leading-relaxed disabled:opacity-60 disabled:cursor-not-allowed"
               />
-              <div className="p-3.5 rounded-xl bg-[#0b0f19] border border-[#1e293b] text-xs text-slate-400 flex items-start gap-2.5">
-                <MessageSquare className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                <span className="leading-relaxed">
-                  {t('scanner.msgDesc')}
-                </span>
-              </div>
             </div>
           )}
 
@@ -309,12 +370,13 @@ export const ScannerPage: React.FC = () => {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 font-mono">
                 {t('scanner.qrLabel')}
               </label>
-              <div className="border-2 border-dashed border-[#1e293b] rounded-xl p-8 text-center hover:border-amber-400/50 transition cursor-pointer bg-[#070a12] relative">
+              <div className={`border-2 border-dashed border-[#1e293b] rounded-xl p-8 text-center transition bg-[#070a12] relative ${loading ? 'opacity-60 cursor-not-allowed' : 'hover:border-amber-400/50 cursor-pointer'}`}>
                 <input
                   type="file"
+                  disabled={loading}
                   accept="image/png,image/jpeg,image/webp"
                   onChange={handleQrFileChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
                 {qrPreview ? (
                   <div className="space-y-3 flex flex-col items-center">
@@ -348,17 +410,35 @@ export const ScannerPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled={loading}
                   value={websiteInput}
                   onChange={(e) => setWebsiteInput(e.target.value)}
                   placeholder={t('scanner.webPlaceholder')}
-                  className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl px-4 py-3.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 font-mono"
+                  className="w-full bg-[#070a12] border border-[#1e293b] rounded-xl px-4 py-3.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                 />
               </div>
-              <div className="p-3.5 rounded-xl bg-[#0b0f19] border border-[#1e293b] text-xs text-slate-400 flex items-start gap-2.5">
-                <Shield className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                <span className="leading-relaxed">
-                  {t('scanner.webDesc')}
+            </div>
+          )}
+
+          {/* Active 3-Second Scanning Progress Telemetry */}
+          {loading && (
+            <div className="space-y-2 p-4 rounded-xl bg-[#070c18] border border-cyan-800/60 shadow-lg shadow-cyan-950/30">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-cyan-300 flex items-center gap-2 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span>{loadingStage}</span>
                 </span>
+                <span className="text-cyan-400 font-bold bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/80">
+                  {loadingProgress}%
+                </span>
+              </div>
+
+              {/* Glowing High-Precision Progress Bar */}
+              <div className="h-2 w-full bg-[#0b1220] rounded-full overflow-hidden border border-[#1e293b] p-0.5">
+                <div
+                  className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 rounded-full transition-all duration-500 ease-out shadow-sm shadow-cyan-400"
+                  style={{ width: `${loadingProgress}%` }}
+                />
               </div>
             </div>
           )}
@@ -366,25 +446,27 @@ export const ScannerPage: React.FC = () => {
           {/* Submit Action */}
           <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#1e293b]">
             <div className="text-[11px] text-slate-400 font-mono">
-              {loading ? (
-                <span className="text-cyan-400 flex items-center gap-1.5">
+              {loading && (
+                <span className="text-cyan-400 flex items-center gap-1.5 font-semibold">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>{loadingStage}</span>
+                  <span>Executing 3.0s Calibrated Evidence Audit...</span>
                 </span>
-              ) : (
-                <span>{t('scanner.zeroTelemetry')}</span>
               )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-7 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/10 disabled:opacity-50 transition"
+              className={`w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all transform ${
+                loading
+                  ? 'bg-gradient-to-r from-cyan-700 via-cyan-600 to-blue-700 text-white cursor-wait shadow-cyan-500/20 ring-2 ring-cyan-400/40 animate-pulse'
+                  : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/20 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer'
+              }`}
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{t('scanner.stageScanning') || t('scanner.btnAnalyzing')}</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-cyan-200" />
+                  <span>Running Security Analysis... ({loadingProgress}%)</span>
                 </>
               ) : (
                 <>

@@ -191,16 +191,21 @@ export const ScrollStorySection: React.FC = () => {
             </div>
 
             {/* Modality 1: URL */}
-            <div className={`story-modality-card p-3 rounded-xl border transition-all duration-300 ${
-              activeStep >= 0 ? 'bg-[#0f172a] border-cyan-500/50 text-white' : 'bg-slate-900/40 border-slate-800 text-slate-500'
-            }`}>
+            <div
+              onClick={() => navigate('/scanner?tab=url')}
+              className={`story-modality-card p-3 rounded-xl border transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.99] group ${
+                activeStep >= 0
+                  ? 'bg-[#0f172a] border-cyan-500/50 text-white hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-950/50'
+                  : 'bg-slate-900/40 border-slate-800 text-slate-500 hover:border-cyan-600'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-400">
+                  <div className="p-1.5 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-400 group-hover:bg-cyan-900/80 transition-colors">
                     <Globe className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold font-mono">URL Endpoint</div>
+                    <div className="text-xs font-bold font-mono group-hover:text-cyan-300 transition-colors">URL Endpoint</div>
                     <div className="text-[10px] text-slate-400 font-mono">31 Lexical Features</div>
                   </div>
                 </div>
@@ -211,16 +216,21 @@ export const ScrollStorySection: React.FC = () => {
             </div>
 
             {/* Modality 2: Message */}
-            <div className={`story-modality-card p-3 rounded-xl border transition-all duration-300 ${
-              activeStep >= 0 ? 'bg-[#0f172a] border-purple-500/50 text-white' : 'bg-slate-900/40 border-slate-800 text-slate-500'
-            }`}>
+            <div
+              onClick={() => navigate('/scanner?tab=message')}
+              className={`story-modality-card p-3 rounded-xl border transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.99] group ${
+                activeStep >= 0
+                  ? 'bg-[#0f172a] border-purple-500/50 text-white hover:border-purple-400 hover:shadow-lg hover:shadow-purple-950/50'
+                  : 'bg-slate-900/40 border-slate-800 text-slate-500 hover:border-purple-600'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-purple-950 border border-purple-800 text-purple-400">
+                  <div className="p-1.5 rounded-lg bg-purple-950 border border-purple-800 text-purple-400 group-hover:bg-purple-900/80 transition-colors">
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold font-mono">Message / Email Text</div>
+                    <div className="text-xs font-bold font-mono group-hover:text-purple-300 transition-colors">Message / Email Text</div>
                     <div className="text-[10px] text-slate-400 font-mono">10,000 TF-IDF n-grams</div>
                   </div>
                 </div>
@@ -231,16 +241,21 @@ export const ScrollStorySection: React.FC = () => {
             </div>
 
             {/* Modality 3: QR */}
-            <div className={`story-modality-card p-3 rounded-xl border transition-all duration-300 ${
-              activeStep >= 0 ? 'bg-[#0f172a] border-amber-500/50 text-white' : 'bg-slate-900/40 border-slate-800 text-slate-500'
-            }`}>
+            <div
+              onClick={() => navigate('/scanner?tab=qr')}
+              className={`story-modality-card p-3 rounded-xl border transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.99] group ${
+                activeStep >= 0
+                  ? 'bg-[#0f172a] border-amber-500/50 text-white hover:border-amber-400 hover:shadow-lg hover:shadow-amber-950/50'
+                  : 'bg-slate-900/40 border-slate-800 text-slate-500 hover:border-amber-600'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-amber-950 border border-amber-800 text-amber-400">
+                  <div className="p-1.5 rounded-lg bg-amber-950 border border-amber-800 text-amber-400 group-hover:bg-amber-900/80 transition-colors">
                     <QrCode className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold font-mono">QR Matrix Image</div>
+                    <div className="text-xs font-bold font-mono group-hover:text-amber-300 transition-colors">QR Matrix Image</div>
                     <div className="text-[10px] text-slate-400 font-mono">jsQR Decoder</div>
                   </div>
                 </div>
@@ -251,16 +266,21 @@ export const ScrollStorySection: React.FC = () => {
             </div>
 
             {/* Modality 4: Website */}
-            <div className={`story-modality-card p-3 rounded-xl border transition-all duration-300 ${
-              activeStep >= 0 ? 'bg-[#0f172a] border-emerald-500/50 text-white' : 'bg-slate-900/40 border-slate-800 text-slate-500'
-            }`}>
+            <div
+              onClick={() => navigate('/scanner?tab=website')}
+              className={`story-modality-card p-3 rounded-xl border transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.99] group ${
+                activeStep >= 0
+                  ? 'bg-[#0f172a] border-emerald-500/50 text-white hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-950/50'
+                  : 'bg-slate-900/40 border-slate-800 text-slate-500 hover:border-emerald-600'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-emerald-950 border border-emerald-800 text-emerald-400">
+                  <div className="p-1.5 rounded-lg bg-emerald-950 border border-emerald-800 text-emerald-400 group-hover:bg-emerald-900/80 transition-colors">
                     <Lock className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold font-mono">Website DOM</div>
+                    <div className="text-xs font-bold font-mono group-hover:text-emerald-300 transition-colors">Website DOM</div>
                     <div className="text-[10px] text-slate-400 font-mono">SSRF Multi-Hop Safe</div>
                   </div>
                 </div>

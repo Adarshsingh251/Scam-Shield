@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { Globe, MessageSquare, QrCode, Lock, Activity } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface ThreatVisualProps {
 }
 
 export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScanning = false, onScanComplete }) => {
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const shieldRef = useRef<HTMLDivElement>(null);
@@ -235,6 +237,7 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
       label: 'URL ML',
       tag: 'XGBoost v2',
       status: 'VERIFIED',
+      path: '/scanner?tab=url',
       x: '18%',
       y: '20%',
       icon: <Globe className="w-3.5 h-3.5 text-cyan-400" />,
@@ -245,6 +248,7 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
       label: 'MSG NLP',
       tag: 'TF-IDF + LR',
       status: 'CALIBRATED',
+      path: '/scanner?tab=message',
       x: '82%',
       y: '22%',
       icon: <MessageSquare className="w-3.5 h-3.5 text-purple-400" />,
@@ -255,6 +259,7 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
       label: 'QR MATRIX',
       tag: 'Deterministic',
       status: 'ACTIVE',
+      path: '/scanner?tab=qr',
       x: '18%',
       y: '76%',
       icon: <QrCode className="w-3.5 h-3.5 text-amber-400" />,
@@ -265,6 +270,7 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
       label: 'WEB DOM',
       tag: 'SSRF Shield',
       status: 'GUARDED',
+      path: '/scanner?tab=website',
       x: '82%',
       y: '74%',
       icon: <Lock className="w-3.5 h-3.5 text-emerald-400" />,
@@ -275,6 +281,7 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
       label: 'RISK ENGINE',
       tag: 'Arbitration',
       status: '0-100',
+      path: '/models',
       x: '50%',
       y: '88%',
       icon: <Activity className="w-3.5 h-3.5 text-cyan-400" />,
@@ -460,12 +467,13 @@ export const InteractiveThreatVisual: React.FC<ThreatVisualProps> = ({ isScannin
           {threatNodes.map((node) => (
             <div
               key={node.id}
+              onClick={() => navigate(node.path)}
               style={{
                 left: node.x,
                 top: node.y,
                 transform: 'translate(-50%, -50%) translateZ(35px)'
               }}
-              className={`threat-node absolute pointer-events-auto p-1.5 sm:p-2 rounded-xl border backdrop-blur-md shadow-md transition-all duration-300 ${node.color} ${
+              className={`threat-node absolute pointer-events-auto p-1.5 sm:p-2 rounded-xl border backdrop-blur-md shadow-md transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${node.color} ${
                 isHovered ? 'scale-105 border-opacity-90' : 'border-opacity-40'
               }`}
             >
